@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <script src="/home/js/jquery-1.11.3.min.js"></script>
+    <script src="/home/js/jquery-adapter.js"></script>
+    <script src="/home/js/common.js?11"></script>
+    <script src="/home/js/alipay-face-login.js"></script>
+</head>
+<body>
+<div id="_umfp" style="width:0px;height:0px;overflow:hidden">
+</div>
+<form method="post" id="form" action="" >
+    <input type="hidden" name="action" value="PreLoginAction" />
+	<input type="hidden" name="event_submit_do_PreLogin" value="false" />
+    <input type="hidden" id="deviceIp" name="deviceIp"  value=""/>
+    <input type="hidden" id="trustEnvToken" name="trustEnvToken"  value=""/>
+    <input type="hidden" id="trustEnvTokenErrorInfo" name="trustEnvTokenErrorInfo"  value=""/>
+    <input type="hidden" name="caLoginKey" value=""/>
+    <input type="hidden" name="umidTokenId" value="T18534855445ee2330a99a5c9e6b95459" >
+    <input type="hidden" name="disableCert" value="true" >
+    <input type="hidden" name="alipayFaceMetaInfo" id="alipayFaceMetaInfo" value="" >
+    <!-- <input type="hidden" name="domain" value="" > -->
+</form>
+<script type="text/javascript">
+    window.ssoConfig = {
+        '_sso_csrftoken_': 'TE966R91-GDYM4I3PZI53I1HGL83M3-59KNIALK-QLPV7',
+        'intranet': 'true',
+        'ipAddr': '42.120.72.121',
+    }
+
+        try {
+        var metaInfo = getMetaInfo();
+        if (metaInfo != undefined) {
+            $('#alipayFaceMetaInfo').val(JSON.stringify(metaInfo));
+        }
+    } catch (e) {
+    }
+
+
+try {
+        var getIpComplete = false;
+	function onJSONPCallback(data) {
+		$('#deviceIp').val(data.x_forwarded_for);
+        getIpComplete=true;
+	}
+	GetDeviceIp("https://buc-office.alibaba-inc.com/ip.js");
+
+    	var trustEnvToken = false;
+	var trustEnvTokenErrorInfo = {};
+    function tetCb(data) {
+        if (data && data.token) {
+            $('#trustEnvToken').val(data.token);
+            trustEnvToken=true;
+        } else {
+            trustEnvToken=false;
+            trustEnvTokenErrorInfo = {"readyState": 4, "status": 200, "statusText": "token is blank"};
+        }
+    }
+    var pageLoadTimestamp = new Date().getTime();
+
+    getTrustEnvToken('tetCb', 'buc-sso_001', 1, '51706b63c6fe463a8a9cf613c4ebdf21', pageLoadTimestamp, trustEnvTokenErrorInfo);
+
+    var iIntervalId =setInterval(function(){
+        var currentTimestamp = new Date().getTime();
+        if((currentTimestamp-pageLoadTimestamp) > 600 || (getIpComplete && trustEnvToken)){
+            clearInterval(iIntervalId);
+            try {
+                if (!trustEnvTokenErrorInfo) {
+                    trustEnvTokenErrorInfo = {};
+                }
+
+                if (!trustEnvToken) {
+                    if (!trustEnvTokenErrorInfo.statusText) {
+                        trustEnvTokenErrorInfo.statusText = "no response, maybe timeout";
+                    }
+                }
+
+                trustEnvTokenErrorInfo.requestId = '51706b63c6fe463a8a9cf613c4ebdf21';
+                trustEnvTokenErrorInfo.time = pageLoadTimestamp;
+                $("#trustEnvTokenErrorInfo").val(JSON.stringify(trustEnvTokenErrorInfo));
+            } catch (e) {
+            }
+            // console.log("errorInfo=" + JSON.stringify(trustEnvTokenErrorInfo))
+            document.getElementById('form').submit();
+        }
+    },50);
+} catch (e) {
+    document.getElementById('form').submit();
+}
+
+</script> 
+</body>
+</html>
+<script>
+    (function (w, d, t) {
+        var s = d.createElement(t), m = d.getElementsByTagName(t)[0];
+        s.async = 1;
+        s.src = "https://g.alicdn.com/sd/pointman/js/pt2.js?_=" + Math.floor((new Date()).getTime() / 36e5);
+        m.parentNode.insertBefore(s, m);
+
+        w._pointman_q = w._pointman_q || [];
+        _pointman_q.push(["um", function (umx) {
+            var container = document.getElementById("_umfp");
+            umx.init({
+                timeout: 3000,
+                userId: '',
+                token: 'T18534855445ee2330a99a5c9e6b95459',
+                userFieldId: 'loginAccountInput',
+                serviceLocation: "cn",
+                appName: 'buc',
+                model: 'L1',
+                containers: {flash: container, dcp: container}
+            });
+        }]);
+    })(window, document, "script");
+</script>
